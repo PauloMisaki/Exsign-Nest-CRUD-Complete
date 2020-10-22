@@ -1,63 +1,79 @@
-import { Controller, Delete, Get, HttpStatus, Put, Patch, Req, Res } from '@nestjs/common';
-import { FriendsService } from './friends.service'
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Put,
+  Patch,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { FriendsService } from './friends.service';
 
-// MARK: /friends controller. Access by http://localhost:8002/friends or http://127.0.0.1:8002
+// Este é /friends controller. Acesse através de http://localhost:8002/friends ou http://127.0.0.1:8002
 @Controller('/friends')
 export class FriendsController {
-  // MARK: Import of the friends service. Access by using this.service inside the methods.
+  // Import do friends service. Acesse seus dados através do this.service no conteúdo abaixo.
   constructor(private readonly service: FriendsService) {}
 
-  /* 
-    MARK:
-    Objective: Retrieve all friends from the current list
-    Expected Return: Array of Friends 
-  */
   @Get()
   async getAll(@Req() req: any, @Res() res: any) {
-    res.status(HttpStatus.OK).json({ success: true })
+    const friends = this.service.getAll();
+    // Variável friend recebe o valor de getAll que está contido no 'FriendsController', que retorna friends do service.
+    // LEMBRANDO QUE THIS.SERVICE.GETALL SIGNIFICA QUE ESTÁ CHAMANDO DO CONSTRUTOR, MESMO QUE EXISTA JÁ A FUNÇÃO GETALL AQUI.
+
+    res.status(HttpStatus.OK).json(friends);
+    // 'res' no caso, a resposta que é enviada, está retornando a variável 'friends', contendo a lista de amigos.
   }
 
-  /* 
-    MARK:
-    Objective: Retrieve the info from a single friend by it's name
-    Paramaters: Name of the friend
-    Expected Return: Single friend 
-  */
-  @Get()
+  @Get('/:name')
+  // Especificando que você precisa receber o parametro 'name' no url
   async getByName(@Req() req: any, @Res() res: any) {
-    res.status(HttpStatus.OK).json({ success: true })
+    const name = req.params.name;
+    // O dado recebido do 'url' está sendo armazenado nessa variável, sendo 'req' a requisição, 'params' o parametro inserido, e 'name', o nome
+
+    const found = this.service.getByName(name);
+    // const found está recebendo o valor de 'name' que está em getByName < Efetivamente, o nome do amigo pesquisado
+
+    res.status(HttpStatus.OK).json(found);
+    // Respondendo com o nome do amigo e suas informações, que estão contidas na variável found
   }
 
-  /* 
-    MARK:
-    Objective: Add a friend into the list
-    Paramaters: Data for the new friend
-    Expected Return: Success message - status
-  */
   @Put()
   async addFriend(@Req() req: any, @Res() res: any) {
-    res.status(HttpStatus.OK).json({ success: true })
+    const addFriend = req.body;
+    // Recebendo os dados do body ( podendo ser: nome, idade, genero e desejo nesse exemplo ) e atribuindo seus valores a variável addFriend.
+
+    this.service.addFriend(addFriend);
+    // Chamando addFriend do FriendService, e passando seus valores.
+
+    res.status(HttpStatus.OK).json({ success: true });
+    // Retorna resultado positivo
   }
 
-  /* 
-    MARK:
-    Objective: Update one of the friends of the list
-    Paramaters: Name of the friend and Data that will be updated
-    Expected Return: Success message - status
-  */
-  @Patch()
+  @Patch('/:name')
+  // Recebe nome do amigo que deseja alterar
   async updateFriend(@Req() req: any, @Res() res: any) {
-    res.status(HttpStatus.OK).json({ success: true })
+    const nameFriend = req.params.name;
+    // Salvando o nome do amigo a ser alterado na variável nameFriend, para uso na função
+
+    const editFriend = req.body;
+    // Salvando os dados a serem alterados do amigo em especifico, dando o valor de 'body' a variável 'editFriend'
+
+    this.service.updateFriend(nameFriend, editFriend);
+    // Chama a função com os novos valores
+
+    res.status(HttpStatus.OK).json({ success: true });
   }
 
-  /* 
-    MARK:
-    Objective: Remove one of the friends of the list
-    Paramaters: Name of the friend
-    Expected Return: Success message - status
-  */
-  @Delete()
-  async deleteByNickname(@Req() req: any, @Res() res: any) { 
-    res.status(HttpStatus.OK).json({ success: true })
+  @Delete('/:name')
+  async deleteByNickname(@Req() req: any, @Res() res: any) {
+    const deleteByName = req.params.name;
+    // Novamente estou atribuindo o valor do parametro da url na variável deleteByName, para armazenar o dado e usa-lo.
+
+    this.service.deleteFriend(deleteByName);
+    // Chamando a função para confirmar a remoção do nome
+
+    res.status(HttpStatus.OK).json({ success: true });
   }
 }
